@@ -49,27 +49,17 @@ describe("GET/api/articles", () => {
         ];
         expect(articles).toBeInstanceOf(Array);
         expect(articles).toEqual(specifiedArticle);
-        expect(
-          articles.every((property) => property.hasOwnProperty("article_id"))
-        ).toBe(true);
-        expect(
-          articles.every((property) => property.hasOwnProperty("title"))
-        ).toBe(true);
-        expect(
-          articles.every((property) => property.hasOwnProperty("topic"))
-        ).toBe(true);
-        expect(
-          articles.every((property) => property.hasOwnProperty("author"))
-        ).toBe(true);
-        expect(
-          articles.every((property) => property.hasOwnProperty("body"))
-        ).toBe(true);
-        expect(
-          articles.every((property) => property.hasOwnProperty("created_at"))
-        ).toBe(true);
-        expect(
-          articles.every((property) => property.hasOwnProperty("votes"))
-        ).toBe(true);
+        expect(articles).toMatchObject([
+          {
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
+          },
+        ]);
       });
   });
   test("should return an an error of 404 and a message when given an invalid id", () => {
@@ -86,6 +76,26 @@ describe("GET/api/articles", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad Request");
+      });
+  });
+});
+
+describe("get/api/users", () => {
+  test("should return an array of user objects and properties of username, name, avatar_url", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        users.forEach((property) => {
+          expect(property).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
       });
   });
 });

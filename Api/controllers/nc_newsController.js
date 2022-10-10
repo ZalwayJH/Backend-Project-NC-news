@@ -1,5 +1,8 @@
-const { fetchTopics } = require("../models/nc_newsModel");
-const { fetchArticles } = require("../models/nc_newsModel");
+const {
+  fetchTopics,
+  fetchArticles,
+  fetchUsers,
+} = require("../models/nc_newsModel");
 
 exports.getTopics = (req, res, next) => {
   fetchTopics()
@@ -16,6 +19,16 @@ exports.getArticlesId = (req, res, next) => {
   fetchArticles(article_id)
     .then((articles) => {
       res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getUsers = (req, res, next) => {
+  fetchUsers()
+    .then((users) => {
+      res.status(200).send({ users });
     })
     .catch((err) => {
       next(err);
