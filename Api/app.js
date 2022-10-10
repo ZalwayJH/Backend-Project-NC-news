@@ -1,11 +1,11 @@
 const express = require("express");
-const news = require("../db/data/test-data/index");
 const app = express();
-const { getTopics } = require("./controllers/topicsController");
+const { getTopics, getArticlesId } = require("./controllers/nc_newsController");
 
 app.use(express.json());
 
 app.get("/api/topics", getTopics);
+app.get("/api/articles/:article_id", getArticlesId);
 
 app.use((err, req, res, next) => {
   if (err.status) {
@@ -13,18 +13,6 @@ app.use((err, req, res, next) => {
   } else {
     next(err);
   }
-});
-
-app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid Input" });
-  } else {
-    next(err);
-  }
-});
-
-app.use((err, req, res, next) => {
-  res.status(500).send({ msg: "Internal Server Error" });
 });
 
 module.exports = app;
