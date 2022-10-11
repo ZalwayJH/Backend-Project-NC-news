@@ -1,4 +1,3 @@
-const { idleCount } = require("../../db/connection");
 const db = require("../../db/connection");
 
 exports.fetchArticles = (id) => {

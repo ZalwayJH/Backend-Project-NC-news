@@ -18,7 +18,7 @@ describe("get/api/topics", () => {
       .then(({ body }) => {
         const { topics } = body;
         expect(topics).toBeInstanceOf(Array);
-        expect(topics.length).toBe(3);
+        expect(topics).toHaveLength(3);
         expect(
           topics.every((property) => property.hasOwnProperty("slug"))
         ).toBe(true);
@@ -84,7 +84,7 @@ describe("get/api/users", () => {
       .expect(200)
       .then(({ body }) => {
         const { users } = body;
-        expect(users.length).toBe(4);
+        expect(users).toHaveLength(4);
         expect(users).toBeInstanceOf(Array);
         users.forEach((property) => {
           expect(property).toEqual(
@@ -161,4 +161,4 @@ describe("PATCH/api/articles/:article_id", () => {
         expect(body.msg).toBe("Invalid article Id, please try another Id");
       });
   });
-});
+
