@@ -36,30 +36,27 @@ describe("GET/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        const specifiedArticle = [
-          {
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 100,
-          },
-        ];
-        expect(articles).toBeInstanceOf(Array);
+        const specifiedArticle = {
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+        };
+
+        expect(articles).toBeInstanceOf(Object);
         expect(articles).toEqual(specifiedArticle);
-        expect(articles).toMatchObject([
-          {
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 100,
-          },
-        ]);
+        expect(articles).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+        });
       });
   });
   test("should return an an error of 404 and a message when given an invalid id", () => {
@@ -87,6 +84,7 @@ describe("get/api/users", () => {
       .expect(200)
       .then(({ body }) => {
         const { users } = body;
+        expect(users).toBeInstanceOf(Array);
         users.forEach((property) => {
           expect(property).toEqual(
             expect.objectContaining({
