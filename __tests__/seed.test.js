@@ -84,6 +84,7 @@ describe("get/api/users", () => {
       .expect(200)
       .then(({ body }) => {
         const { users } = body;
+        expect(users.length).toBe(4);
         expect(users).toBeInstanceOf(Array);
         users.forEach((property) => {
           expect(property).toEqual(
@@ -94,6 +95,70 @@ describe("get/api/users", () => {
             })
           );
         });
+      });
+  });
+});
+
+describe("PATCH/api/articles/:article_id", () => {
+  test("200: should return the article object with the votes incremented by the input amount", () => {
+    const updatedVotes = { incr_votes: 5 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(updatedVotes)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        const updatedExample = {
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 105,
+        };
+        expect(article).toEqual(updatedExample);
+      });
+  });
+  test("200: should return the article object with the votes decremented by the input amount", () => {
+    const updatedVotes = { incr_votes: -100 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(updatedVotes)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        const updatedExample = {
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 0,
+        };
+        expect(article).toEqual(updatedExample);
+        expect(article).toBeInstanceOf(Object);
+      });
+  });
+  test("400: should return an error and message when given the wrong type of input", () => {
+    const updatedVotes = { incr_votes: 100 };
+    return request(app)
+      .patch("/api/articles/jaffacake")
+      .send(updatedVotes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("404: should return an error and message when there is no matching Id in the database", () => {
+    const updatedVotes = { incr_votes: 100 };
+    return request(app)
+      .patch("/api/articles/99999")
+      .send(updatedVotes)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid article Id, please try another Id");
       });
   });
 });
