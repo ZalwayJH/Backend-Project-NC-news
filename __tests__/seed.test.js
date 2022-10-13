@@ -35,7 +35,7 @@ describe("GET/api/articles", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        const { articles } = body;
+        const articles = body;
         const specifiedArticle = {
           article_id: 1,
           title: "Living in the shadow of a great man",
@@ -44,8 +44,8 @@ describe("GET/api/articles", () => {
           body: "I find this existence challenging",
           created_at: "2020-07-09T20:11:00.000Z",
           votes: 100,
+          comment_count: 11,
         };
-
         expect(articles).toBeInstanceOf(Object);
         expect(articles).toEqual(specifiedArticle);
         expect(articles).toMatchObject({
@@ -54,6 +54,7 @@ describe("GET/api/articles", () => {
           topic: "mitch",
           author: "butter_bridge",
           body: "I find this existence challenging",
+          comment_count: 11,
           created_at: "2020-07-09T20:11:00.000Z",
           votes: 100,
         });
@@ -161,4 +162,92 @@ describe("PATCH/api/articles/:article_id", () => {
         expect(body.msg).toBe("Invalid article Id, please try another Id");
       });
   });
+  test("400: should return an error and message if the vote number is a string", () => {
+    const updatedVotes = { incr_votes: "fred" };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(updatedVotes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});
 
+describe("get/api/article/:article_id(comments)", () => {
+  test("should return an article object with a new row of comment_count with the number of comments associated with that article_id", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const article = body;
+        const specifiedArticle = {
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          comment_count: 11,
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+        };
+        expect(article.comment_count).toBe(11);
+        expect(article).toEqual(specifiedArticle);
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          comment_count: 11,
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+        });
+      });
+  });
+  test("testing with another id to make sure it functions correctly", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body }) => {
+        const article = body;
+        const specifiedArticle = {
+          article_id: 3,
+          title: "Eight pug gifs that remind me of mitch",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "some gifs",
+          created_at: "2020-11-03T09:12:00.000Z",
+          votes: 0,
+          comment_count: 2,
+        };
+        expect(article).toEqual(specifiedArticle);
+        expect(article).toMatchObject({
+          article_id: 3,
+          title: "Eight pug gifs that remind me of mitch",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "some gifs",
+          created_at: "2020-11-03T09:12:00.000Z",
+          votes: 0,
+          comment_count: 2,
+        });
+      });
+  });
+  test("should return 404 when give the wrong query type", () => {
+    return request(app)
+      .get("/api/articles/Banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("should return 400 when given an id that does'nt exist", () => {
+    return request(app)
+      .get("/api/articles/666")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid article Id, please try another Id");
+      });
+  });
+});
