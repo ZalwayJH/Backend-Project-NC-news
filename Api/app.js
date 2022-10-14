@@ -4,12 +4,14 @@ const { getTopics } = require("./controllers/topicsController.js");
 const {
   getArticlesId,
   patchArticleById,
+  getArticles,
 } = require("./controllers/articlesController");
 
 const { getUsers } = require("./controllers/usersController");
 
 app.use(express.json());
 
+app.get("/api/articles", getArticles);
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticlesId);
 app.get("/api/users", getUsers);
