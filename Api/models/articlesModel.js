@@ -1,5 +1,26 @@
 const db = require("../../db/connection");
 
+exports.fetchArticlesComments = (id) => {
+  if (/^\d+$/.test(id) !== true) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+  return db
+    .query(
+      `SELECT comments.* FROM comments 
+      WHERE comments.article_id = $1 ORDER BY created_at ASC;`,
+      [id]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Invalid Id, please try another",
+        });
+      }
+      return rows;
+    });
+};
+
 exports.fetchArticles = (query) => {
   let queryStr = `SELECT articles.*, 
   COUNT(comments.article_id) ::INT AS comment_count
@@ -9,8 +30,12 @@ exports.fetchArticles = (query) => {
   const queryValue = [];
 
   if (query) {
-    if (/^[A-Za-z]*$/.test(query) !== true) {
-      return Promise.reject({ status: 400, msg: "Bad Request" });
+    const greenList = ["cats", "mitch"];
+    if (!greenList.includes(query)) {
+      return Promise.reject({
+        status: 404,
+        msg: "Invalid search term, please try another",
+      });
     }
     queryStr += ` WHERE articles.topic = $1`;
     queryValue.push(query);

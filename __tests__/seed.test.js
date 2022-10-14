@@ -300,13 +300,45 @@ describe("get/api/articles", () => {
         expect(error.msg).toBe("Invalid search term, please try another");
       });
   });
-  test("should return a 400 error when the query is the wrong type of primitive", () => {
+});
+
+describe("GET/api/articles/:article_id/comments", () => {
+  test("should return an array of comments for the given article_id", () => {
     return request(app)
-      .get("/api/articles/?topic=c4t")
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body;
+        expect(articles).toHaveLength(11);
+        articles.forEach((property) => {
+          expect(property).toEqual(
+            expect.objectContaining({
+              article_id: expect.any(Number),
+              comment_id: expect.any(Number),
+              author: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+            })
+          );
+        });
+        expect(articles).toBeSortedBy("created_at");
+      });
+  });
+  test("should return an error and message if the id is incorrect", () => {
+    return request(app)
+      .get("/api/articles/99999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid Id, please try another");
+      });
+  });
+  test("should return an error and message if the id is the wrong type", () => {
+    return request(app)
+      .get("/api/articles/bubble9/comments")
       .expect(400)
       .then(({ body }) => {
-        const error = body;
-        expect(error.msg).toBe("Bad Request");
+        expect(body.msg).toBe("Bad Request");
       });
   });
 });
