@@ -102,3 +102,33 @@ exports.updateArticleById = (newVotes, id) => {
       return rows[0];
     });
 };
+
+exports.sendComments = (id, newComment) => {
+  const { username, body } = newComment;
+
+  if (/^\d+$/.test(id) !== true) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  console.log(body);
+  if (body.trim() === "") {
+    return Promise.reject({ status: 204, msg: "No comment to post" });
+  }
+
+  return db
+    .query(`SELECT * FROM users WHERE username = $1;`, [username])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "User does not exist" });
+      } else {
+        return db
+          .query(
+            `INSERT INTO comments (article_id, author, body) VALUES($1, $2, $3) RETURNING *;`,
+            [id, username, body]
+          )
+          .then(({ rows }) => {
+            return rows;
+          });
+      }
+    });
+};
