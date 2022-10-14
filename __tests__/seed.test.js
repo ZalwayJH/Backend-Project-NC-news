@@ -310,3 +310,45 @@ describe("get/api/articles", () => {
       });
   });
 });
+
+describe("POST/api/articles/:article_id/comments", () => {
+  test("should send a comment with a username to the database and respond with that posted comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "icellusedkars", body: "Good doggo much wow" })
+      .expect(201)
+      .then(({ body }) => {
+        const newComment = body[0];
+        expect(newComment).toHaveProperty("author", "icellusedkars");
+        expect(newComment).toHaveProperty("body", "Good doggo much wow");
+        expect(body).toHaveLength(1);
+      });
+  });
+  test("returns an error when the username does not exist", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "gollum", body: "whats taters precious?" })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("User does not exist");
+      });
+  });
+  test("returns an error when the comment isnt a string", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "gollum", body: 3 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("returns an error when the request body endpoints are incorrect", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ AuthorName: "icellusedkars", Pbody: "Good doggo much wow" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});

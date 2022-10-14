@@ -77,3 +77,26 @@ exports.updateArticleById = (newVotes, id) => {
       return rows[0];
     });
 };
+
+exports.sendComments = (id, newComment) => {
+  const usernameGreenList = ["butter_bridge", "icellusedkars"];
+
+  const { username, body } = newComment;
+
+  if (typeof body !== "string") {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  if (!usernameGreenList.includes(username)) {
+    return Promise.reject({ status: 404, msg: "User does not exist" });
+  }
+
+  return db
+    .query(
+      `INSERT INTO comments (article_id, author, body) VALUES($1, $2, $3) RETURNING *;`,
+      [id, username, body]
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+};
