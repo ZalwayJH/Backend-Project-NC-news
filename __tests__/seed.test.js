@@ -251,3 +251,62 @@ describe("get/api/article/:article_id(comments)", () => {
       });
   });
 });
+
+describe("get/api/articles", () => {
+  test("should return all articles when no endpoint is supplied with a row of comment_count", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body;
+        expect(articles).toHaveLength(12);
+        expect(articles).toBeSortedBy("created_at", {
+          descending: true,
+          coerce: true,
+        });
+        articles.forEach((property) => {
+          expect(property).toEqual(
+            expect.objectContaining({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("should return all articles with the matching topic query 'cats'", () => {
+    return request(app)
+      .get("/api/articles/?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body;
+        expect(articles).toHaveLength(1);
+        expect(articles[0].topic).toBe("cats");
+        expect(articles[0]).toHaveProperty("comment_count", 2);
+      });
+  });
+  test("should return an error of 404 when the query value does not exist in the table", () => {
+    return request(app)
+      .get("/api/articles/?topic=frog")
+      .expect(404)
+      .then(({ body }) => {
+        const error = body;
+        expect(error.msg).toBe("Invalid search term, please try another");
+      });
+  });
+  test("should return a 400 error when the query is the wrong type of primitive", () => {
+    return request(app)
+      .get("/api/articles/?topic=c4t")
+      .expect(400)
+      .then(({ body }) => {
+        const error = body;
+        expect(error.msg).toBe("Bad Request");
+      });
+  });
+});

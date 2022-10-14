@@ -1,11 +1,23 @@
 const {
-  fetchArticles,
+  fetchArticlesId,
   updateArticleById,
+  fetchArticles,
 } = require("../models/articlesModel.js");
+
+exports.getArticles = (req, res, next) => {
+  const { topic } = req.query;
+  fetchArticles(topic)
+    .then((articles) => {
+      res.status(200).send(articles);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.getArticlesId = (req, res, next) => {
   const { article_id } = req.params;
-  fetchArticles(article_id)
+  fetchArticlesId(article_id)
     .then((articles) => {
       res.status(200).send(articles);
     })
