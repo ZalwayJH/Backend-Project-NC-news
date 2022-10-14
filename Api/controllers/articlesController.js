@@ -2,6 +2,16 @@ const {
   fetchArticlesId,
   updateArticleById,
   fetchArticles,
+<<<<<<< HEAD
+  fetchArticlesComments,
+} = require("../models/articlesModel.js");
+
+exports.getArticleComments = (req, res, next) => {
+  const { article_id } = req.params;
+  fetchArticlesComments(article_id)
+    .then((articles) => {
+      res.status(200).send(articles);
+=======
   sendComments,
 } = require("../models/articlesModel.js");
 
@@ -11,6 +21,7 @@ exports.postComments = (req, res, next) => {
   sendComments(article_id, newComment)
     .then((articles) => {
       res.status(201).send(articles);
+>>>>>>> main
     })
     .catch((err) => {
       next(err);

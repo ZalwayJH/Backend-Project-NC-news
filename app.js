@@ -5,6 +5,7 @@ const {
   getArticlesId,
   patchArticleById,
   getArticles,
+  getArticleComments,
   postComments,
 } = require("./Api/controllers/articlesController");
 
@@ -12,6 +13,7 @@ const { getUsers } = require("./Api/controllers/usersController");
 
 app.use(express.json());
 
+app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post("/api/articles/:article_id/comments", postComments);
 app.get("/api/articles", getArticles);
 app.get("/api/topics", getTopics);
