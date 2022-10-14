@@ -1,14 +1,14 @@
 const express = require("express");
 const app = express();
-const { getTopics } = require("./controllers/topicsController.js");
+const { getTopics } = require("./Api/controllers/topicsController.js");
 const {
   getArticlesId,
   patchArticleById,
   getArticles,
   postComments,
-} = require("./controllers/articlesController");
+} = require("./Api/controllers/articlesController");
 
-const { getUsers } = require("./controllers/usersController");
+const { getUsers } = require("./Api/controllers/usersController");
 
 app.use(express.json());
 
