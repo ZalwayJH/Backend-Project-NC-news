@@ -2,7 +2,7 @@ const seed = require("../db/seeds/seed");
 const testsData = require("../db/data/test-data/index");
 const db = require("../db/connection");
 const request = require("supertest");
-const app = require("../Api/app");
+const app = require("../app");
 
 afterAll(() => db.end());
 
@@ -311,7 +311,7 @@ describe("get/api/articles", () => {
   });
 });
 
-describe("POST/api/articles/:article_id/comments", () => {
+describe.only("POST/api/articles/:article_id/comments", () => {
   test("should send a comment with a username to the database and respond with that posted comment", () => {
     return request(app)
       .post("/api/articles/1/comments")
@@ -333,22 +333,22 @@ describe("POST/api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("User does not exist");
       });
   });
-  test("returns an error when the comment isnt a string", () => {
+  test("returns an error when the request body endpoints are incorrect", () => {
     return request(app)
-      .post("/api/articles/1/comments")
-      .send({ username: "gollum", body: 3 })
+      .post("/api/articles/apples/comments")
+      .send({ username: "icellusedkars", body: "Good doggo much wow" })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad Request");
       });
   });
-  test("returns an error when the request body endpoints are incorrect", () => {
+  xtest("returns an error when the comment body is empty", () => {
     return request(app)
-      .post("/api/articles/1/comments")
-      .send({ AuthorName: "icellusedkars", Pbody: "Good doggo much wow" })
-      .expect(400)
+      .post("/api/articles/1/")
+      .send({ username: "icellusedkars", body: "Good doggo much wow" })
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad Request");
+        expect(body.msg).toBe("No comment to post");
       });
   });
 });
