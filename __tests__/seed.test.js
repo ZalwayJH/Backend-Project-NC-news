@@ -252,7 +252,7 @@ describe("get/api/article/:article_id(comments)", () => {
   });
 });
 
-describe("get/api/articles", () => {
+describe.only("get/api/articles", () => {
   test("should return all articles when no endpoint is supplied with a row of comment_count", () => {
     return request(app)
       .get("/api/articles")
@@ -343,7 +343,7 @@ describe("GET/api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only("POST/api/articles/:article_id/comments", () => {
+describe("POST/api/articles/:article_id/comments", () => {
   test("should send a comment with a username to the database and respond with that posted comment", () => {
     return request(app)
       .post("/api/articles/1/comments")

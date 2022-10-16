@@ -30,13 +30,6 @@ exports.fetchArticles = (query) => {
   const queryValue = [];
 
   if (query) {
-    const greenList = ["cats", "mitch"];
-    if (!greenList.includes(query)) {
-      return Promise.reject({
-        status: 404,
-        msg: "Invalid search term, please try another",
-      });
-    }
     queryStr += ` WHERE articles.topic = $1`;
     queryValue.push(query);
   }
@@ -110,7 +103,6 @@ exports.sendComments = (id, newComment) => {
     return Promise.reject({ status: 400, msg: "Bad Request" });
   }
 
-  console.log(body);
   if (body.trim() === "") {
     return Promise.reject({ status: 204, msg: "No comment to post" });
   }
