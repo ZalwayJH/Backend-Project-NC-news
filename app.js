@@ -7,12 +7,16 @@ const {
   getArticles,
   getArticleComments,
   postComments,
+  removeArticleById,
+  getEndpoints,
 } = require("./Api/controllers/articlesController");
 
 const { getUsers } = require("./Api/controllers/usersController");
 
 app.use(express.json());
 
+app.delete("/api/articles/:article_id", removeArticleById);
+app.get("/api", getEndpoints);
 app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post("/api/articles/:article_id/comments", postComments);
 app.get("/api/articles", getArticles);
