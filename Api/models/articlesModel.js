@@ -1,4 +1,11 @@
 const db = require("../../db/connection");
+const endpoints = require("../../endpoints.json");
+
+exports.getAllEndpoints = (path) => {
+  if (path === "/api") {
+    return endpoints;
+  }
+};
 
 exports.fetchArticlesComments = (id) => {
   if (/^\d+$/.test(id) !== true) {
@@ -21,7 +28,32 @@ exports.fetchArticlesComments = (id) => {
     });
 };
 
-exports.fetchArticles = (query) => {
+exports.fetchArticles = (query, sort = "created_at", order = "DESC") => {
+  const greenListSorted = [
+    "article_id",
+    "topic",
+    "body",
+    "created_at",
+    "comment_count",
+    "votes",
+    "author",
+  ];
+  const greenListOrder = ["ASC", "DESC"];
+
+  if (!greenListSorted.includes(sort)) {
+    return Promise.reject({
+      status: 404,
+      msg: "Cannot sort by invalid column name",
+    });
+  }
+
+  if (!greenListOrder.includes(order)) {
+    return Promise.reject({
+      status: 404,
+      msg: "Cannot Order by Invalid option",
+    });
+  }
+
   let queryStr = `SELECT articles.*, 
   COUNT(comments.article_id) ::INT AS comment_count
   FROM articles
@@ -34,7 +66,7 @@ exports.fetchArticles = (query) => {
     queryValue.push(query);
   }
 
-  queryStr += ` GROUP BY articles.article_id ORDER BY created_at DESC;`;
+  queryStr += ` GROUP BY articles.article_id ORDER BY ${sort} ${order};`;
 
   return db.query(queryStr, queryValue).then(({ rows }) => {
     if (rows.length === 0) {
@@ -122,5 +154,29 @@ exports.sendComments = (id, newComment) => {
             return rows;
           });
       }
+    });
+};
+
+exports.deleteArticle = (id) => {
+  if (/^\d+$/.test(id) !== true) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  return db
+    .query(`SELECT * FROM articles WHERE article_id = $1;`, [id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Input Id Does not exist",
+        });
+      }
+      return db
+        .query(
+          `DELETE FROM articles WHERE articles.article_id = ${id} RETURNING *;`
+        )
+        .then(({ rows }) => {
+          return rows;
+        });
     });
 };

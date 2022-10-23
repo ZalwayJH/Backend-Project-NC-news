@@ -252,7 +252,7 @@ describe("get/api/article/:article_id(comments)", () => {
   });
 });
 
-describe.only("get/api/articles", () => {
+describe("get/api/articles", () => {
   test("should return all articles when no endpoint is supplied with a row of comment_count", () => {
     return request(app)
       .get("/api/articles")
@@ -341,46 +341,124 @@ describe("GET/api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
+
+  describe("POST/api/articles/:article_id/comments", () => {
+    test("should send a comment with a username to the database and respond with that posted comment", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "icellusedkars", body: "Good doggo much wow" })
+        .expect(201)
+        .then(({ body }) => {
+          const newComment = body[0];
+          expect(newComment).toHaveProperty("author", "icellusedkars");
+          expect(newComment).toHaveProperty("body", "Good doggo much wow");
+          expect(body).toHaveLength(1);
+        });
+    });
+    test("returns an error when the username does not exist", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "gollum", body: "whats taters precious?" })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("User does not exist");
+        });
+    });
+    test("returns an error when the request body endpoints are incorrect", () => {
+      return request(app)
+        .post("/api/articles/apples/comments")
+        .send({ username: "icellusedkars", body: "Good doggo much wow" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+  });
 });
 
-describe("POST/api/articles/:article_id/comments", () => {
-  test("should send a comment with a username to the database and respond with that posted comment", () => {
+describe("GET/api/articles(queries)", () => {
+  test("should add the sort_by feature and order by desc by default", () => {
     return request(app)
-      .post("/api/articles/1/comments")
-      .send({ username: "icellusedkars", body: "Good doggo much wow" })
-      .expect(201)
+      .get("/api/articles?sort_by=article_id")
+      .expect(200)
       .then(({ body }) => {
-        const newComment = body[0];
-        expect(newComment).toHaveProperty("author", "icellusedkars");
-        expect(newComment).toHaveProperty("body", "Good doggo much wow");
-        expect(body).toHaveLength(1);
+        const articles = body;
+        expect(articles).toBeSortedBy("article_id", {
+          descending: true,
+          coerce: true,
+        });
       });
   });
-  test("returns an error when the username does not exist", () => {
+  test("should return an error when given an invalid sort_by query", () => {
     return request(app)
-      .post("/api/articles/1/comments")
-      .send({ username: "gollum", body: "whats taters precious?" })
+      .get("/api/articles?sort_by=BUBBLES")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("User does not exist");
+        const articles = body;
+        expect(articles.msg).toBe("Cannot sort by invalid column name");
       });
   });
-  test("returns an error when the request body endpoints are incorrect", () => {
+  test("should add the order feature to the function that defaults the sort to created_at", () => {
     return request(app)
-      .post("/api/articles/apples/comments")
-      .send({ username: "icellusedkars", body: "Good doggo much wow" })
+      .get("/api/articles?order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body;
+        expect(articles).toBeSortedBy("created_at", {
+          ascending: true,
+          coerce: true,
+        });
+      });
+  });
+  test("should return an error when given an incorrect order query", () => {
+    return request(app)
+      .get("/api/articles?order=cats")
+      .expect(404)
+      .then(({ body }) => {
+        const articles = body;
+        expect(articles.msg).toBe("Cannot Order by Invalid option");
+      });
+  });
+});
+
+describe("DELETE/api/articles/:article_id", () => {
+  test("should delete an article by it id", () => {
+    return request(app)
+      .delete("/api/articles/2")
+      .expect(204)
+      .then((body) => {
+        expect(body.res.statusMessage).toBe("No Content");
+      });
+  });
+  test("should return an error if the id is not a number", () => {
+    return request(app)
+      .delete("/api/articles/4bob")
       .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Bad Request");
+      .then((body) => {
+        const { _body } = body;
+        expect(_body.msg).toBe("Bad Request");
       });
   });
-  xtest("returns an error when the comment body is empty", () => {
+  test("should return an error if id doesnt match one in the database", () => {
     return request(app)
-      .post("/api/articles/1/")
-      .send({ username: "icellusedkars", body: "Good doggo much wow" })
+      .delete("/api/articles/999999")
       .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("No comment to post");
+      .then((body) => {
+        const { _body } = body;
+        expect(_body.msg).toBe("Input Id Does not exist");
+      });
+  });
+});
+
+describe("GET/api", () => {
+  test("should return a json page with all the available endpoints and their descriptions", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .expect("Content-Type", "application/json; charset=utf-8")
+      .then((body) => {
+        const { _body } = body;
+        expect(_body).toBeInstanceOf(Object);
       });
   });
 });
