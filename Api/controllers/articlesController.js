@@ -10,7 +10,6 @@ const {
 const newEndpoints = require("../../endpoints.json");
 
 exports.getEndpoints = (req, res, next) => {
-  console.log(newEndpoints);
   res
     .status(200)
     .send(newEndpoints)

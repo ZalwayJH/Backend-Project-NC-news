@@ -10,16 +10,110 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles, if queried with order, will default to created_at descending",
+    "queries": ["author", "topic", "sort_by", "order", "votes", "created_at"],
     "exampleResponse": {
       "articles": [
         {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
+          "article_id": 1,
+          "title": "Living in the shadow of a great man",
+          "topic": "mitch",
+          "author": "butter_bridge",
+          "body": "I find this existence challenging",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 100,
+          "comment_count": 11
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an array of articles matching the specified Id",
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "article_id": 1,
+          "title": "Living in the shadow of a great man",
+          "topic": "mitch",
+          "author": "butter_bridge",
+          "body": "I find this existence challenging",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 100,
+          "comment_count": 11
+        }
+      ]
+    }
+  },
+  "GET /api/users": {
+    "description": "should return an array of user objects",
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "username": "butter_bridge",
+          "name": "'jonny'",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "200: should return a specified article by the id with the votes incremented or decremented by the input amount",
+    "queries": [{ "incr_votes": -5 }],
+    "exampleResponse": {
+      "articles": [
+        {
+          "article_id": 1,
+          "title": "Living in the shadow of a great man",
+          "topic": "mitch",
+          "author": "butter_bridge",
+          "body": "I find this existence challenging",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 95,
+          "comment_count": 11
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "should return an array of comments for the given article_id",
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "article_id": 1,
+          "author": "cooljmessy",
+          "body": "Ut accusamus enim vel voluptate quae temporibus labore neque a. Reprehenderit iste est eos velit fugit vel quod velit.",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 19,
+          "comment_id": 33
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "should send a comment with a username to the database and respond with that posted comment",
+    "queries": [{ "username": "icellusedkars", "body": "Good doggo much wow" }],
+    "exampleResponse": {
+      "articles": [
+        {
+          "author": "icellusedkars",
+          "body": "Good doggo much wow",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 19,
+          "comment_id": 33
+        }
+      ]
+    }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "should delete an article by its id",
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "204": "No Content"
         }
       ]
     }
