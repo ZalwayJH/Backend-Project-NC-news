@@ -422,7 +422,7 @@ describe("GET/api/articles(queries)", () => {
 });
 
 describe("DELETE/api/articles/:article_id", () => {
-  test("should delete an article by it id", () => {
+  test("should delete an article by its id", () => {
     return request(app)
       .delete("/api/articles/2")
       .expect(204)
