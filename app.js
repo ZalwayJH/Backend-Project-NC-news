@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const { getTopics } = require("./Api/controllers/topicsController.js");
 const {
   getArticlesId,
@@ -13,6 +14,7 @@ const {
 
 const { getUsers } = require("./Api/controllers/usersController");
 
+app.use(cors());
 app.use(express.json());
 
 app.delete("/api/articles/:article_id", removeArticleById);
