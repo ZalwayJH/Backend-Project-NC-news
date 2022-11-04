@@ -439,7 +439,7 @@ describe("DELETE/api/articles/:article_id", () => {
         expect(_body.msg).toBe("Bad Request");
       });
   });
-  test("should return an error if id doesnt match one in the database", () => {
+  test("should return an error if id doesn't match one in the database", () => {
     return request(app)
       .delete("/api/articles/999999")
       .expect(404)
